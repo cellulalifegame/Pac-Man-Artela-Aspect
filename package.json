@@ -12,7 +12,7 @@
     "asbuild:release": "asc aspect/index.ts --target release",
     "contract:bind": "node scripts/bind.cjs",
     "contract:deploy": "node scripts/contract-deploy.cjs",
-    "contract:build": "solc -o ./build/contract/ --abi --storage-layout --bin ./contracts/*.sol --overwrite",
+    "contract:build": "solc -o .\\build\\contract --abi --storage-layout --bin .\\contracts\\Storage.sol --overwrite",
     "build": "npm run contract:build && npm run aspect:gen && npm run aspect:build",
     "test": "node tests",
     "contract:unbind": "node scripts/unbind.cjs",
