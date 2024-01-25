@@ -6,10 +6,11 @@ import {
     IAspectOperation,
     OperationInput,
     uint8ArrayToHex,
+    hexToUint8Array,
     stringToUint8Array,
     sys,
 } from "@artela/aspect-libs";
-import {IAspectBase} from "@artela/aspect-libs/types/aspect-interface";
+import {uint8ArrayToString} from "@artela/aspect-libs/common/helper/convert";
 
 /**
  * Please describe what functionality this aspect needs to implement.
@@ -17,7 +18,7 @@ import {IAspectBase} from "@artela/aspect-libs/types/aspect-interface";
  * About the concept of Aspect @see [join-point](https://docs.artela.network/develop/core-concepts/join-point)
  * How to develop an Aspect  @see [Aspect Structure](https://docs.artela.network/develop/reference/aspect-lib/aspect-structure)
  */
-class Aspect implements IAspectOperation, IAspectBase {
+class Aspect implements IAspectOperation {
 
     /**
      * isOwner is the governance account implemented by the Aspect, when any of the governance operation
@@ -70,13 +71,12 @@ class Aspect implements IAspectOperation, IAspectBase {
         }
 
         // ... add more if you have more operations
-
         sys.revert("unknown op");
         return new Uint8Array(0);
     }
 
     hello(params: string): string {
-        return "hello " + params;
+        return "hello " + uint8ArrayToString(hexToUint8Array(params));
     }
 
     parseOP(callData: string): string {
@@ -97,8 +97,8 @@ class Aspect implements IAspectOperation, IAspectBase {
 }
 
 // 2.register aspect Instance
-const aspect = new Aspect()
-entryPoint.setAspect(aspect)
+const aspect = new Aspect();
+entryPoint.setOperationAspect(aspect);
 
 // 3.must export it
 export { execute, allocate }
