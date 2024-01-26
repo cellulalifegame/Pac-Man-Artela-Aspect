@@ -6,34 +6,62 @@ import {
     OperationInput,
     uint8ArrayToHex,
     hexToUint8Array,
+    uint8ArrayToString,
     stringToUint8Array,
     sys,
 } from "@artela/aspect-libs";
-import {uint8ArrayToString} from "@artela/aspect-libs/common/helper/convert";
 
-type Point = [number, number];
-type MapType = number[][];
-type Configs = {
-    getIsObstacle?: (tileValue: number, x: number, y: number) => boolean;
-    getCostFactor?: (tileValue: number, currentPoint: Point, parentPoint: Point | null) => number;
-};
-type Node = {
-    value: number;
-    g: number;
-    h: number;
-    f: number;
-    x: number;
-    y: number;
+class Point {
+    x: i32;
+    y: i32;
+
+    constructor(x: i32, y: i32) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+type MapType = i32[][];
+
+class Configs {
+    getIsObstacle: ((tileValue: i32, x: i32, y: i32) => bool) | null;
+    getCostFactor: ((tileValue: i32, currentPoint: Point, parentPoint: Point | null) => f64) | null;
+
+    constructor(getIsObstacle: ((tileValue: i32, x: i32, y: i32) => bool) | null, getCostFactor: ((tileValue: i32, currentPoint: Point, parentPoint: Point | null) => f64) | null) {
+        this.getIsObstacle = getIsObstacle;
+        this.getCostFactor = getCostFactor;
+    }
+}
+
+class Node {
+    value: i32;
+    g: i32;
+    h: i32;
+    f: i32;
+    x: i32;
+    y: i32;
     point: Point;
     parent: Node | null;
-};
 
-const map: MapType = [
+    constructor(value: i32, g: i32, h: i32, f: i32, x: i32, y: i32, point: Point, parent: Node | null) {
+        this.value = value;
+        this.g = g;
+        this.h = h;
+        this.f = f;
+        this.x = x;
+        this.y = y;
+        this.point = point;
+        this.parent = parent;
+    }
+}
+
+let map: MapType = [
     [0, 0, 1, 0],
     [0, 0, 1, 0],
     [0, 0, 0, 1],
     [0, 0, 0, 0],
 ];
+
 /**
  * Please describe what functionality this aspect needs to implement.
  *
@@ -85,6 +113,7 @@ class Aspect implements IAspectOperation {
         }
         if (op == "0002") {
             // ... implement your logic here
+            this.findPath(new Point(0, 0), new Point(3, 3), map, new Configs(null, null));
             return new Uint8Array(0);
         }
         if (op == "0003") {
@@ -116,119 +145,44 @@ class Aspect implements IAspectOperation {
             return callData.substring(4, callData.length);
         }
     }
-    findPath(startPoint: Point, targetPoint: Point, map: MapType, configs?: Configs): Point[] {
-        configs = configs || {};
 
-        const getIsObstacle = configs.getIsObstacle || ((tileValue: number, x: number, y: number) => {
-            return tileValue == 1;
-        });
+    findPath(startPoint: Point, targetPoint: Point, map: MapType, configs: Configs): Point[] {
+        let row: i32 = map.length;
+        let col: i32 = map[0].length;
+        let openList: Node[] = [];
+        let closeList: Map<string, Node> = new Map<string, Node>();
+        let nodes: Map<string, Node> = new Map<string, Node>();
 
-        const getCostFactor = configs.getCostFactor || ((tileValue: number, currentPoint: Point, parentPoint: Point | null) => {
-            if (!parentPoint) {
-                return 1;
-            }
-            return currentPoint[0] != parentPoint[0] && currentPoint[1] !== parentPoint[1] ? 1.4 : 1;
-        });
+        let startNode: Node | null = this.createNode(startPoint, null, nodes, map, configs, targetPoint);
+        let endNode: Node | null = this.createNode(targetPoint, null, nodes, map, configs, targetPoint);
 
-        const row: number = map.length,
-            col: number = map[0].length;
-        const openList: Node[] = [],
-            closeList: { [key: string]: Node } = {},
-            nodes: { [key: string]: Node } = {};
-
-        function nodeKey(point: Point): string {
-            return `${point[0]},${point[1]}`;
-        }
-
-        function createNode(point: Point, parentNode: Node | null): Node | null {
-            let key: string = nodeKey(point);
-            if (nodes[key]) {
-                return nodes[key];
-            }
-            let [x2, y2] = point;
-            let tileValue: number = map[y2][x2];
-            let isObstacle: boolean = getIsObstacle(tileValue, x2, y2);
-
-            if (isObstacle) {
-                return null;
-            }
-
-            let cost: number = getCostFactor(tileValue, point, parentNode ? parentNode.point : null);
-            let g: number = parentNode ? (parentNode.g + cost) : 0;
-            let h: number = Math.abs(targetPoint[0] - x2) + Math.abs(targetPoint[1] - y2);
-            let f: number = g + h;
-
-            const node: Node = {
-                value: tileValue,
-                g: g,
-                h: h,
-                f: f,
-                x: x2,
-                y: y2,
-                point: point,
-                parent: parentNode
-            };
-
-            nodes[key] = node;
-            return node;
-        }
-
-        function getNeighbors(currentNode: Node): Node[] {
-            let neighbors: Node[] = [];
-            let directions: Point[] = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-
-            directions.forEach(d => {
-                let newPoint: Point = [currentNode.x + d[0], currentNode.y + d[1]];
-                if (newPoint[0] >= 0 && newPoint[0] < col && newPoint[1] >= 0 && newPoint[1] < row) {
-                    let neighbor: Node | null = createNode(newPoint, currentNode);
-                    if (neighbor && closeList[nodeKey(newPoint)] === undefined) {
-                        neighbors.push(neighbor);
-                    }
-                }
-            });
-
-            return neighbors;
-        }
-
-        function reconstructPath(node: Node | null): Point[] {
-            let path: Point[] = [];
-            while (node) {
-                path.unshift(node.point);
-                node = node.parent;
-            }
-            return path;
-        }
-
-        let startNode: Node | null = createNode(startPoint, null);
-        let endNode: Node| null = createNode(targetPoint, null);
-
-        if (!startNode || !endNode) {
-            return []; // If the start or end point is not reachable, return an empty array
+        if (startNode === null || endNode === null) {
+            return [];
         }
 
         openList.push(startNode);
 
         while (openList.length > 0) {
-            // Sort the open list based on the F value and choose the node with the smallest F value to process
             openList.sort((a, b) => a.f - b.f);
-            let currentNode: Node = openList.shift()!; // The exclamation mark (!) asserts that the value is non-null
-            closeList[nodeKey(currentNode.point)] = currentNode;
+            let currentNode: Node = openList.shift() as Node;
 
-            if (currentNode.x === targetPoint[0] && currentNode.y === targetPoint[1]) {
-                return reconstructPath(currentNode);
+            let currentNodeKey = this.nodeKey(currentNode.point);
+            closeList.set(currentNodeKey, currentNode);
+
+            if (currentNode.x === targetPoint.x && currentNode.y === targetPoint.y) {
+                return this.reconstructPath(currentNode);
             }
 
-            let neighbors: Node[] = getNeighbors(currentNode);
-            for (let i = 0; i < neighbors.length; i++) {
+            let neighbors: Node[] = this.getNeighbors(currentNode, nodes, map, configs, row, col, closeList);
+            for (let i: i32 = 0; i < neighbors.length; i++) {
                 let neighbor: Node = neighbors[i];
-                let neighborKey: string = nodeKey(neighbor.point);
+                let neighborKey: string = this.nodeKey(neighbor.point);
 
-                if (closeList[neighborKey]) {
+                if (closeList.has(neighborKey)) {
                     continue;
                 }
 
-                let tentative_gScore: number = currentNode.g + getCostFactor(neighbor.value, neighbor.point, currentNode.point);
-
+                let tentative_gScore: i32 = <i32>(currentNode.g + this.getCostFactor(neighbor.value, neighbor.point, currentNode.point, configs));
                 if (!openList.includes(neighbor) || tentative_gScore < neighbor.g) {
                     neighbor.parent = currentNode;
                     neighbor.g = tentative_gScore;
@@ -240,8 +194,82 @@ class Aspect implements IAspectOperation {
             }
         }
 
-        return []; // Return an empty array if no path is found
+        return [];
     }
+
+    private nodeKey(point: Point): string {
+        return `${point.x},${point.y}`;
+    }
+
+    private createNode(point: Point, parentNode: Node | null, nodes: Map<string, Node>, map: MapType, configs: Configs, targetPoint: Point): Node | null {
+        let key: string = this.nodeKey(point);
+        if (nodes.has(key)) {
+            return nodes.get(key);
+        }
+        let x2: i32 = point.x;
+        let y2: i32 = point.y;
+        let tileValue: i32 = map[y2][x2];
+        let isObstacle: bool = this.getIsObstacle(tileValue, x2, y2, configs);
+
+        if (isObstacle) {
+            return null;
+        }
+
+        let cost: f64 = this.getCostFactor(tileValue, point, parentNode ? parentNode.point : null, configs);
+        let g: i32 = parentNode ? <i32>(parentNode.g + cost) : 0;
+        let h: i32 = <i32>(Math.abs(targetPoint.x - x2) + Math.abs(targetPoint.y - y2));
+        let f: i32 = g + h;
+
+        let node: Node = new Node(tileValue, g, h, f, x2, y2, point, parentNode);
+        nodes.set(key, node);
+        return node;
+    }
+
+    private getNeighbors(currentNode: Node, nodes: Map<string, Node>, map: MapType, configs: Configs, row: i32, col: i32, closeList: Map<string, Node>): Node[] {
+        let neighbors: Node[] = [];
+        let directions: Point[] = [new Point(1, 0), new Point(0, 1), new Point(-1, 0), new Point(0, -1)];
+
+        for (let i: i32 = 0; i < directions.length; i++) {
+            let d: Point = directions[i];
+            let newPoint: Point = new Point(currentNode.x + d.x, currentNode.y + d.y);
+            if (newPoint.x >= 0 && newPoint.x < col && newPoint.y >= 0 && newPoint.y < row) {
+                let neighbor: Node | null = this.createNode(newPoint, currentNode, nodes, map, configs, newPoint);
+                if (neighbor && !closeList.has(this.nodeKey(newPoint))) {
+                    neighbors.push(neighbor);
+                }
+            }
+        }
+
+        return neighbors;
+    }
+
+    private reconstructPath(node: Node | null): Point[] {
+        let path: Point[] = [];
+        while (node !== null) {
+            path.unshift(node.point);
+            node = node.parent;
+        }
+        return path;
+    }
+
+    private getIsObstacle(tileValue: i32, x: i32, y: i32, configs: Configs): bool {
+        if (configs.getIsObstacle !== null) {
+            return configs.getIsObstacle(tileValue, x, y);
+        }
+        return tileValue == 1;
+    }
+
+    private getCostFactor(tileValue: i32, currentPoint: Point, parentPoint: Point | null, configs: Configs): f64 {
+        if (configs.getCostFactor !== null) {
+            return configs.getCostFactor(tileValue, currentPoint, parentPoint);
+        }
+        if (!parentPoint) {
+            return 1.0;
+        }
+        return currentPoint.x != parentPoint.x && currentPoint.y !== parentPoint.y ? 1.4 : 1.0;
+    }
+
+
 }
 
 // 2.register aspect Instance
