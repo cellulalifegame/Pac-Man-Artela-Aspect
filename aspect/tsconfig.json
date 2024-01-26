@@ -2,5 +2,9 @@
   "extends": "assemblyscript/std/assembly.json",
   "include": [
     "./**/*.ts"
-  ]
+  ],
+  "compilerOptions": {
+    "target": "es5",
+    "downlevelIteration": true
+  }
 }
