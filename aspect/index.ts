@@ -56,10 +56,23 @@ class Node {
 }
 
 let map: MapType = [
-    [0, 0, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-    [0, 0, 0, 0],
+    [0, 0, 1, 0,  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 1, 0,  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 1,  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
 ];
 
 /**
@@ -113,8 +126,12 @@ class Aspect implements IAspectOperation {
         }
         if (op == "0002") {
             // ... implement your logic here
-            this.findPath(new Point(0, 0), new Point(3, 3), map, new Configs(null, null));
-            return new Uint8Array(0);
+            const aa: Point[] = this.findPath(new Point(0, 0), new Point(15, 15), map, new Configs(null, null));
+            const bb: Point[] = this.findPath(new Point(15, 15), new Point(0, 0), map, new Configs(null, null));
+            const pointsStr: string = this.pointsToString(aa);
+            const pointsStrBB: string = this.pointsToString(bb);
+            const result: string = pointsStr+'-----------'+pointsStrBB
+            return stringToUint8Array(result);
         }
         if (op == "0003") {
             // ... implement your logic here
@@ -269,7 +286,13 @@ class Aspect implements IAspectOperation {
         return currentPoint.x != parentPoint.x && currentPoint.y !== parentPoint.y ? 1.4 : 1.0;
     }
 
-
+    private pointsToString(points: Point[]): string {
+        let result: string[] = [];
+        for (let i = 0, k = points.length; i < k; ++i) {
+            result.push(`Point { x: ${points[i].x}, y: ${points[i].y} }`);
+        }
+        return result.join(", ");
+    }
 }
 
 // 2.register aspect Instance
