@@ -55,41 +55,16 @@ class Node {
     }
 }
 
-let map: MapType = [
-    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+const map: MapType = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 /**
@@ -143,16 +118,39 @@ class Aspect implements IAspectOperation {
         }
         if (op == "0002") {
             // ... implement your logic here
-            const aa: Point[] = this.findPath(new Point(0, 0), new Point(30, 30), map, new Configs(null, null));
-            const bb: Point[] = this.findPath(new Point(30, 30), new Point(0, 0), map, new Configs(null, null));
-            const pointsStr: string = this.pointsToString(aa);
-            const pointsStrBB: string = this.pointsToString(bb);
-            const result: string = pointsStr + '-----------' + pointsStrBB
+            let initPosition: Point | null = null
+            let ghostPosition: Point | null = null
+            const userList: Point[][] = []
+            const ghostList: Point[][] = []
+            const coordinate: Point = new Point(0,0)
+            let currentMap: MapType = this.cloneMap(map)
+            for (let i = 0; i < 5; i++) {
+                let furthestCoordinates: Point = this.getOppositeCorner(coordinate.x, coordinate.y, 5);
+                const aa: Point[] = this.findPath(initPosition instanceof Point ? initPosition : new Point(0, 0), furthestCoordinates, currentMap, new Configs(null, null));
+                initPosition = aa[0]
+                userList.push(aa)
+                const bb: Point[] = this.findPath(ghostPosition instanceof Point ? ghostPosition : new Point(4, 4), initPosition, currentMap, new Configs(null, null));
+                ghostPosition = bb[0]
+                ghostList.push(bb)
+                let theMap: MapType = this.cloneMap(map)
+                const xNum: i32 = bb[0].x
+                const yNum: i32 = bb[0].y
+                theMap[yNum-1][xNum-1] = 1
+                currentMap = theMap
+            }
+            const userArray: Point[] = userList.flat()
+            const ghostArray: Point[] = ghostList.flat()
+            const userStr: string = this.pointsToString(userArray);
+            const ghostStr: string = this.pointsToString(ghostArray);
+            const map2: MapType = this.cloneMap(map)
+            const result: string = userStr + '---------' + ghostStr + '---------' + currentMap.join(", ")
             return stringToUint8Array(result);
         }
         if (op == "0003") {
             // ... implement your logic here
-            return new Uint8Array(0);
+            const currentMap: MapType = this.cloneMap(map)
+            const result: string = currentMap.join(", ")
+            return stringToUint8Array(result);
         }
 
         // ... add more if you have more operations
@@ -186,7 +184,6 @@ class Aspect implements IAspectOperation {
         let openList: Node[] = [];
         let closeList: Map<string, Node> = new Map<string, Node>();
         let nodes: Map<string, Node> = new Map<string, Node>();
-
         let startNode: Node | null = this.createNode(startPoint, null, nodes, map, configs, targetPoint);
         let endNode: Node | null = this.createNode(targetPoint, null, nodes, map, configs, targetPoint);
 
@@ -234,7 +231,6 @@ class Aspect implements IAspectOperation {
     private nodeKey(point: Point): string {
         return `${point.x},${point.y}`;
     }
-
     private createNode(point: Point, parentNode: Node | null, nodes: Map<string, Node>, map: MapType, configs: Configs, targetPoint: Point): Node | null {
         let key: string = this.nodeKey(point);
         if (nodes.has(key)) {
@@ -280,8 +276,11 @@ class Aspect implements IAspectOperation {
     private reconstructPath(node: Node | null): Point[] {
         let path: Point[] = [];
         while (node !== null) {
-            path.unshift(node.point);
-            node = node.parent;
+            path.unshift(node.point); // 在第二次迭代时获取点
+            node = node.parent; // 移动到下一个节点
+        }
+        if (path.length > 1) {
+            path = [path[1]]
         }
         return path;
     }
@@ -309,6 +308,28 @@ class Aspect implements IAspectOperation {
             result.push(`Point { x: ${points[i].x}, y: ${points[i].y} }`);
         }
         return result.join(", ");
+    }
+    private getOppositeCorner(x: i32, y: i32, matrixSize: i32): Point {
+        // 在AssemblyScript中，使用i32()进行显式类型转换
+        let halfMatrixSize = i32(matrixSize / 2);
+        let oppositeX: i32 = x < halfMatrixSize ? matrixSize - 1 : 0;
+        let oppositeY: i32 = y < halfMatrixSize ? matrixSize - 1 : 0;
+
+        return new Point(oppositeX, oppositeY);
+    }
+    private getRandomInt(): i32 {
+        // 生成1到30之间的随机整数
+        return <i32>(Math.floor(Math.random() * (30 - 1 + 1)) + 1);
+    }
+    private cloneMap(originalMap: MapType): MapType {
+        let clonedMap: MapType = new Array<i32[]>(originalMap.length);
+        for (let i = 0; i < originalMap.length; ++i) {
+            clonedMap[i] = new Array<i32>(originalMap[i].length);
+            for (let j = 0; j < originalMap[i].length; ++j) {
+                clonedMap[i][j] = originalMap[i][j];
+            }
+        }
+        return clonedMap;
     }
 }
 
