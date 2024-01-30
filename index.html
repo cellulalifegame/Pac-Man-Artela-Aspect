@@ -53,7 +53,8 @@
     Operation: <input value="0002" type="text" id="op" /><br>
     Parameter: <input value="haha" type="text" id="param" /><br>
     Private Key (WARNING: Do not use in production!): <input value="c91a4898b1717abf30679b1d79a7bd4c3e9ff9a48e41edc8faebf9554eac071b" type="text" id="privateKey" /><br>
-    <button id="executeButton">Execute</button>
+    <button id="executeButton">Execute</button><br>
+    Round: <span id="countdown-display">50</span>
     <div class="map-container" id="map-container">
         <!-- The map will be programmatically populated with cells here -->
         <div id="mover1" class="mover"></div>
@@ -192,14 +193,22 @@
     // Function to move the divs
     function moveDiv(mover, steps) {
         let i = 0;
+        let countdown = steps.length;
+        function updateCountdownDisplay() {
+            document.getElementById('countdown-display').textContent = countdown.toString();
+        }
+
         function nextMove() {
             if (i < steps.length) {
                 const [x, y] = steps[i];
                 mover.style.transform = `translate(${x * 50}px, ${y * 50}px)`;
                 i++;
+                countdown--;
+                updateCountdownDisplay();
                 setTimeout(nextMove, 1000); // Wait 1 second between moves
             }
         }
+        updateCountdownDisplay();
         nextMove();
     }
     const map = [
