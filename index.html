@@ -2,74 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Web3 Interaction</title>
+    <!-- 引入 Web3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@artela/web3"></script>
 </head>
 <body>
-    <script>
-        const Web3 = require('@artela/web3');
-        const fs = require('fs');
-        const projectConfig = JSON.parse(fs.readFileSync('./project.config.json', 'utf-8'));
-        const argv = require('yargs')
-            .string('aspect')
-            .boolean('call')
-            .string('op')
-            .string('param')
-            .argv;
 
-        async function op() {
-            // prepare necessary data
-            const web3 = new Web3(projectConfig.node);
-            const gasPrice = await web3.eth.getGasPrice();
-            const senderPriKey = '0x69f0c7fb9348363bc138e0230daa7ecab1fd51a1010f4dfcd51b932c83244d2b'
-            const account = web3.eth.accounts.privateKeyToAccount(senderPriKey.trim());
-            web3.eth.accounts.wallet.add(account.privateKey);
+<!-- 配置信息 -->
+<script>
+    const projectConfig = {
+        node: 'https://betanet-rpc1.artela.network', // 你的节点URL
+        // 其他需要的配置
+    };
+</script>
 
-            // init aspect
-            if (!argv.aspect) {
-                console.error("'aspect' cannot be empty, please set by the parameter ' --aspect 0x...'")
-                process.exit(0)
+<!-- 页面内容 -->
+<h1>Web3 Interaction</h1>
+<div>
+    <!-- 提供一个界面让用户输入信息 -->
+    Aspect Address: <input value="0x0A055658Aa4de08FBCD1Fc17E8e984FaE2585cdC" type="text" id="aspect" /><br>
+    Operation: <input value="0002" type="text" id="op" /><br>
+    Parameter: <input value="haha" type="text" id="param" /><br>
+    Private Key (WARNING: Do not use in production!): <input value="0x69f0c7fb9348363bc138e0230daa7ecab1fd51a1010f4dfcd51b932c83244d2b" type="text" id="privateKey" /><br>
+    <button id="executeButton">Execute</button>
+</div>
+
+<script type="module">
+    document.getElementById('executeButton').addEventListener('click', async () => {
+        await op()
+    });
+    export async function op() {
+        // ...
+        // 此处代码需要根据HTML页面中的元素来获取值
+        const aspectAddress = document.getElementById('aspect').value;
+        const operation = document.getElementById('op').value;
+        const parameter = document.getElementById('param').value;
+        const senderPriKey = document.getElementById('privateKey').value;
+        const web3 = new Web3(projectConfig.node);
+        const gasPrice = await web3.eth.getGasPrice();
+        const account = web3.eth.accounts.privateKeyToAccount(senderPriKey.trim());
+        web3.eth.accounts.wallet.add(account.privateKey);
+
+        const aspect = new web3.atl.Aspect(aspectAddress);
+
+        // init op
+        let op = operation;
+        let params = parameter;
+
+        // concat param and op
+        let callData = '0x' + (params.startsWith('0x') ? op + params.substring(2) : op + stringToHex(params));
+
+        console.log("op: ", op);
+        console.log("params: ", params);
+
+        let aspectCore = web3.atl.aspectCore();
+
+        if (1==1) {
+            console.log(`op call start with callData: ${callData} to aspect: ${aspectAddress}`);
+            let result = await aspectCore.methods.entrypoint(
+                aspectAddress,
+                callData
+            ).call();
+            console.log('op call finished')
+            console.log(hexToString(result));
+        } else {
+            const nonce = await web3.eth.getTransactionCount(account.address);
+            let encodedData = aspect.operation(callData).encodeABI();
+
+            tx = {
+                from: account.address,
+                nonce: nonce,
+                gasPrice,
+                gas: 8000000,
+                data: encodedData,
+                to: aspectCore.options.address,
             }
 
-            const aspect = new web3.atl.Aspect(argv.aspect);
-
-            // init op
-            let op = argv.op;
-            let params = argv.param;
-
-            // concat param and op
-            let callData = '0x' + (params.startsWith('0x') ? op + params.substring(2) :  op + stringToHex(params));
-
-            console.log("op: ", op);
-            console.log("params: ", params);
-
-            let aspectCore = web3.atl.aspectCore();
-
-            if (argv.call) {
-                console.log(`op call start with callData: ${ callData } to aspect: ${ argv.aspect }`);
-                let result = await aspectCore.methods.entrypoint(
-                    argv.aspect,
-                    callData
-                ).call();
-                console.log('op call finished')
-                console.log(hexToString(result));
-            } else {
-                const nonce = await web3.eth.getTransactionCount(account.address);
-                let encodedData = aspect.operation(callData).encodeABI();
-
-                tx = {
-                    from: account.address,
-                    nonce: nonce,
-                    gasPrice,
-                    gas: 8000000,
-                    data: encodedData,
-                    to: aspectCore.options.address,
-                }
-
-                const signedTx = await web3.eth.accounts.signTransaction(tx, account.privateKey);
-                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-                console.log('op tx finished')
-                console.log(receipt);
-            }
+            const signedTx = await web3.eth.accounts.signTransaction(tx, account.privateKey);
+            const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+            console.log('op tx finished')
+            console.log(receipt);
         }
 
         function stringToHex(str) {
@@ -87,12 +99,8 @@
             }
             return val;
         }
+    }
 
-        op().catch(console.error);
-
-    </script>
-    <div class="container">
-        <button>onclick</button>
-    </div>
+</script>
 </body>
 </html>

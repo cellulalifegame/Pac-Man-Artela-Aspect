@@ -21,7 +21,7 @@ async function op() {
     console.error("'aspect' cannot be empty, please set by the parameter ' --aspect 0x...'")
     process.exit(0)
   }
-
+  console.log(typeof argv.aspect)
   const aspect = new web3.atl.Aspect(argv.aspect);
 
   // init op
