@@ -58,15 +58,14 @@ class Node {
 const map: MapType = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 1, 0, 1],
+    [1, 0, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 1, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
-
 /**
  * Please describe what functionality this aspect needs to implement.
  *
@@ -122,28 +121,31 @@ class Aspect implements IAspectOperation {
             let ghostPosition: Point | null = null
             const userList: Point[][] = []
             const ghostList: Point[][] = []
-            const coordinate: Point = new Point(0,0)
+            let coordinate: Point = new Point(7,7)
             let currentMap: MapType = this.cloneMap(map)
-            for (let i = 0; i < 5; i++) {
-                let furthestCoordinates: Point = this.getOppositeCorner(coordinate.x, coordinate.y, 5);
-                const aa: Point[] = this.findPath(initPosition instanceof Point ? initPosition : new Point(0, 0), furthestCoordinates, currentMap, new Configs(null, null));
-                initPosition = aa[0]
-                userList.push(aa)
-                const bb: Point[] = this.findPath(ghostPosition instanceof Point ? ghostPosition : new Point(4, 4), initPosition, currentMap, new Configs(null, null));
-                ghostPosition = bb[0]
-                ghostList.push(bb)
-                let theMap: MapType = this.cloneMap(map)
-                const xNum: i32 = bb[0].x
-                const yNum: i32 = bb[0].y
-                theMap[yNum-1][xNum-1] = 1
-                currentMap = theMap
+            for (let i = 0; i < 50; i++) {
+                let furthestCoordinates: Point = this.getOppositeCorner(coordinate.x, coordinate.y);
+                const userStep: Point[] = this.findPath(initPosition instanceof Point ? initPosition : coordinate,furthestCoordinates, currentMap, new Configs(null, null));
+                if (userStep.length) {
+                    initPosition = userStep[0]
+                }
+                userList.push(userStep)
+                const ghostStep: Point[] = this.findPath(ghostPosition instanceof Point ? ghostPosition : new Point(7, 1),userStep.length ? userStep[0] : coordinate, currentMap, new Configs(null, null));
+                if (ghostStep.length) {
+                    ghostPosition = ghostStep[0]
+                    coordinate.x = ghostStep[0].x
+                    coordinate.y = ghostStep[0].y
+                }
+                ghostList.push(ghostStep)
+                if (ghostStep[0].x === userStep[0].x && ghostStep[0].y === userStep[0].y) {
+                    break
+                }
             }
             const userArray: Point[] = userList.flat()
             const ghostArray: Point[] = ghostList.flat()
             const userStr: string = this.pointsToString(userArray);
             const ghostStr: string = this.pointsToString(ghostArray);
-            const map2: MapType = this.cloneMap(map)
-            const result: string = userStr + '---------' + ghostStr + '---------' + currentMap.join(", ")
+            const result: string = userStr + '---------' + ghostStr
             return stringToUint8Array(result);
         }
         if (op == "0003") {
@@ -276,8 +278,8 @@ class Aspect implements IAspectOperation {
     private reconstructPath(node: Node | null): Point[] {
         let path: Point[] = [];
         while (node !== null) {
-            path.unshift(node.point); // 在第二次迭代时获取点
-            node = node.parent; // 移动到下一个节点
+            path.unshift(node.point);
+            node = node.parent;
         }
         if (path.length > 1) {
             path = [path[1]]
@@ -309,17 +311,15 @@ class Aspect implements IAspectOperation {
         }
         return result.join(", ");
     }
-    private getOppositeCorner(x: i32, y: i32, matrixSize: i32): Point {
-        // 在AssemblyScript中，使用i32()进行显式类型转换
-        let halfMatrixSize = i32(matrixSize / 2);
-        let oppositeX: i32 = x < halfMatrixSize ? matrixSize - 1 : 0;
-        let oppositeY: i32 = y < halfMatrixSize ? matrixSize - 1 : 0;
+    public getOppositeCorner(x: i32, y: i32): Point {
+        if (x < 1 || x > 7 || y < 1 || y > 7) {
+            throw new Error("Coordinates are out of the valid game area range.");
+        }
+
+        let oppositeX: i32 = x <= 4 ? 7 : 1;
+        let oppositeY: i32 = y <= 4 ? 7 : 1;
 
         return new Point(oppositeX, oppositeY);
-    }
-    private getRandomInt(): i32 {
-        // 生成1到30之间的随机整数
-        return <i32>(Math.floor(Math.random() * (30 - 1 + 1)) + 1);
     }
     private cloneMap(originalMap: MapType): MapType {
         let clonedMap: MapType = new Array<i32[]>(originalMap.length);

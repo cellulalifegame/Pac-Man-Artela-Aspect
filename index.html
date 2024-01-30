@@ -3,37 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <title>Web3 Interaction</title>
-    <!-- 引入 Web3.js -->
+    <style>
+        .map-container {
+            position: relative;
+            width: 450px; /* 9 cells * 50px each */
+            height: 450px; /* 9 cells * 50px each */
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            box-sizing: border-box;
+            float: left;
+            border: 1px solid #ddd;
+        }
+
+        .wall {
+            background-color: #333;
+        }
+
+        .mover {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            transition: transform 0.5s ease;
+            transform: translate(350px, 350px);
+        }
+
+        .mover.second {
+            background-color: blue;
+            transform: translate(50px, 350px);
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/@artela/web3"></script>
 </head>
 <body>
 
-<!-- 配置信息 -->
 <script>
     const projectConfig = {
-        node: 'https://betanet-rpc1.artela.network', // 你的节点URL
-        // 其他需要的配置
+        node: 'https://betanet-rpc1.artela.network',
     };
 </script>
 
-<!-- 页面内容 -->
 <h1>Web3 Interaction</h1>
 <div>
-    <!-- 提供一个界面让用户输入信息 -->
-    Aspect Address: <input value="0x0A055658Aa4de08FBCD1Fc17E8e984FaE2585cdC" type="text" id="aspect" /><br>
+    Aspect Address: <input value="0xde6906B022b61BFbdE81E56d6bCa5d24F2B95747" type="text" id="aspect" /><br>
     Operation: <input value="0002" type="text" id="op" /><br>
     Parameter: <input value="haha" type="text" id="param" /><br>
-    Private Key (WARNING: Do not use in production!): <input value="0x69f0c7fb9348363bc138e0230daa7ecab1fd51a1010f4dfcd51b932c83244d2b" type="text" id="privateKey" /><br>
+    Private Key (WARNING: Do not use in production!): <input value="c91a4898b1717abf30679b1d79a7bd4c3e9ff9a48e41edc8faebf9554eac071b" type="text" id="privateKey" /><br>
     <button id="executeButton">Execute</button>
+    <div class="map-container" id="map-container">
+        <!-- The map will be programmatically populated with cells here -->
+        <div id="mover1" class="mover"></div>
+        <div id="mover2" class="mover second"></div>
+    </div>
 </div>
 
 <script type="module">
     document.getElementById('executeButton').addEventListener('click', async () => {
         await op()
     });
+    function splitPoints(inputStr) {
+        // Step 1: Split the input string into two parts using "---------" as the separator.
+        const parts = inputStr.split('---------').map(part => part.trim());
+
+        // Step 2: Initialize arrays to hold the points for each part.
+        let arr1 = [];
+        let arr2 = [];
+
+        // Step 3: Iterate over each part to extract the points.
+        parts.forEach((part, index) => {
+            // Split the part into point strings, trimming the whitespace and trailing comma if present.
+            const pointStrings = part.split('},').map(s => s.trim().replace('}', ''));
+
+            // Extract the coordinates from each point string.
+            pointStrings.forEach(pointString => {
+                // Match the x and y values within the string.
+                const matches = pointString.match(/x: (\d+), y: (\d+)/);
+                if (matches && matches.length === 3) {
+                    // Parse the x and y values.
+                    const x = parseInt(matches[1], 10);
+                    const y = parseInt(matches[2], 10);
+
+                    // Depending on the index, push the point to the appropriate array.
+                    if (index === 0) {
+                        arr1.push([y, x]);
+                    } else {
+                        arr2.push([y, x]);
+                    }
+                }
+            });
+        });
+
+        // Return the arrays containing the points.
+        return [arr1, arr2];
+    }
     export async function op() {
-        // ...
-        // 此处代码需要根据HTML页面中的元素来获取值
         const aspectAddress = document.getElementById('aspect').value;
         const operation = document.getElementById('op').value;
         const parameter = document.getElementById('param').value;
@@ -65,6 +131,9 @@
             ).call();
             console.log('op call finished')
             console.log(hexToString(result));
+            const [arr1, arr2] = splitPoints(hexToString(result));
+            moveDiv(mover1, arr1);
+            moveDiv(mover2, arr2);
         } else {
             const nonce = await web3.eth.getTransactionCount(account.address);
             let encodedData = aspect.operation(callData).encodeABI();
@@ -101,6 +170,50 @@
         }
     }
 
+    const mapContainer = document.getElementById('map-container');
+    const mover1 = document.getElementById('mover1');
+    const mover2 = document.getElementById('mover2');
+
+    // Function to draw the map
+    function drawMap(map) {
+        map.forEach(row => {
+            row.forEach(cell => {
+                const cellDiv = document.createElement('div');
+                cellDiv.classList.add('cell');
+                if (cell === 1) {
+                    cellDiv.classList.add('wall');
+                }
+                mapContainer.appendChild(cellDiv);
+            });
+        });
+    }
+
+    // Function to move the divs
+    function moveDiv(mover, steps) {
+        let i = 0;
+        function nextMove() {
+            if (i < steps.length) {
+                const [x, y] = steps[i];
+                mover.style.transform = `translate(${x * 50}px, ${y * 50}px)`;
+                i++;
+                setTimeout(nextMove, 1000); // Wait 1 second between moves
+            }
+        }
+        nextMove();
+    }
+    const map = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ]
+    // Draw the map on the page
+    drawMap(map);
 </script>
 </body>
 </html>
