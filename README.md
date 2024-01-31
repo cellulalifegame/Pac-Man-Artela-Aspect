@@ -7,6 +7,8 @@ This is a sample project of Artela Aspect.
 
 ## Files
 
+![avatar](/img/20240131102306.png)
+
 ```bash
 .
 ├── README.md
