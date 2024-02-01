@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web3 Interaction</title>
+    <title>Cellula - AW-PACMAN</title>
     <style>
         .map-container {
             position: relative;
@@ -47,12 +47,11 @@
     };
 </script>
 
-<h1>Web3 Interaction</h1>
+<h1>Cellula - AW-PACMAN</h1>
 <div>
     Aspect Address: <input value="0xEb882A09508c765904784331780BA9Cd49cac4db" type="text" id="aspect" /><br>
-    Operation: <input value="0002" type="text" id="op" /><br>
-    Parameter: <input value="haha" type="text" id="param" /><br>
     Private Key (WARNING: Do not use in production!): <input value="c91a4898b1717abf30679b1d79a7bd4c3e9ff9a48e41edc8faebf9554eac071b" type="text" id="privateKey" /><br>
+    This address is provided solely for the purpose of facilitating product testing and experience. Please refrain from making any unauthorized operations. Thank you for your cooperation.<br/>
     <button id="executeButton">Execute</button><br>
     Round: <span id="countdown-display">50</span>
     <div class="map-container" id="map-container">
@@ -103,8 +102,8 @@
     }
     export async function op() {
         const aspectAddress = document.getElementById('aspect').value;
-        const operation = document.getElementById('op').value;
-        const parameter = document.getElementById('param').value;
+        const operation = '0002'
+        const parameter = 'haha'
         const senderPriKey = document.getElementById('privateKey').value;
         const web3 = new Web3(projectConfig.node);
         const gasPrice = await web3.eth.getGasPrice();
@@ -221,7 +220,7 @@
         [1, 0, 1, 0, 0, 0, 1, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ]
+    ];
     // Draw the map on the page
     drawMap(map);
 </script>
