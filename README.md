@@ -56,4 +56,4 @@ node tests/test_op.cjs --aspect [Aspect address] call --op 0002 --param haha
 2. **Via HTML Interface**  
    Alternatively, you can interact with your contract using the HTML file located in the root directory. Open this file in a web browser, fill in the required parameters, and click the "Execute" button to start the game or interact with the contract.
 # Website Link
-``https://artela.cellula.fun/
+https://artela.cellula.fun/
