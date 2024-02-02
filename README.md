@@ -10,6 +10,8 @@ The cellula team attempted to implement the A* pathfinding algorithm for the fir
 On Artela, Aspect operates within a wasm virtual machine. The execution efficiency of wasm virtual machine surpasses that of EVM by one to two orders of magnitude. By designing and leveraging the features of Aspect wasm runtime effectively, it can handle high-computational algorithms like the A* pathfinding algorithm, enabling batch computation and updates efficiently.
 Now, utilizing Artela's Aspect technology, we have successfully implemented the pathfinding algorithm to assist the ghost characters in chasing the player character and help the player navigate through the maze, avoiding capture by the ghosts.
 
+Currently, we have successfully achieved approximately 1000 rounds of continuous gameplay with each call. What used to be an off-chain Java system for AI-agent battle games can now be fully implemented on-chain. The gameplay experience is also quite immersive, with a typical battle lasting around 300 rounds. A single automated transaction can execute several complete game sessions.
+
 ![avatar](/img/img.png)
 
 # The design process behind the project
